@@ -4,3 +4,4 @@ lib64
 pyvenv.cfg
 .vscode
 archive
+database.sqlite

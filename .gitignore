@@ -7,3 +7,4 @@ archive
 database.sqlite
 players.csv
 clean_matches_5.csv
+__pycache__

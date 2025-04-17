@@ -10,6 +10,8 @@ import tensorflow as tf
 import tf_keras
 import math 
 import keras
+from datetime import datetime
+
 
 def normalize_all(x): 
     norm = keras.layers.Normalization()
@@ -85,3 +87,31 @@ def already_num(x):
 def score():
     pass 
 
+def date_to_unix(x):
+      date = datetime.strptime(x, "%Y%m%d")
+      return int(date.timestamp())
+
+print(date_to_unix("20250415"))
+
+players = pd.read_csv("players.csv")
+
+clean_matches = pd.read_csv("clean_matches_5.csv", low_memory=False)
+
+clean_players = players[
+    (players["player_id"].isin(clean_matches["winner_id"])) | 
+    (players["player_id"].isin(clean_matches["loser_id"]))
+                        ]
+
+
+clean_players.to_csv("clean_players.csv", index=False)
+
+
+
+cleaned_players = pd.read_csv("clean_players.csv")
+
+
+name_id = cleaned_players[["player_id", "name_first", "name_last"]]
+
+name_id["name_last"] = name_id["name_last"].apply(lambda x: x.split(" ")[-1])
+name_id["name_first"] = name_id["name_first"].apply(lambda x: x.split(" ")[0])
+name_id.to_csv("name_and_ids.csv", index=False)

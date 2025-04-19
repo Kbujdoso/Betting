@@ -3,3 +3,5 @@ clean_matches_6.csv filter=lfs diff=lfs merge=lfs -text
 clean_matches_5.csv filter=lfs diff=lfs merge=lfs -text
 players.csv filter=lfs diff=lfs merge=lfs -text
 name_and_ids.csv filter=lfs diff=lfs merge=lfs -text
+num_matches.csv filter=lfs diff=lfs merge=lfs -text
+num_matches2.csv filter=lfs diff=lfs merge=lfs -text

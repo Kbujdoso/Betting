@@ -1,22 +1,16 @@
 import os
-# Keep using Keras 2
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 os.environ['TF_USE_LEGACY_KERAS'] = '1'
 
+import tensorflow as tf
 import tensorflow_decision_forests as tfdf
-
 import numpy as np
 import pandas as pd
-import tensorflow as tf
 import tf_keras
-import math 
 import keras
+import math 
+import re
 from datetime import datetime
-
-
-def normalize_all(x): 
-    norm = keras.layers.Normalization()
-    norm.adapt(x)
-    return norm(x)
 
 
 def surface(x):
@@ -29,17 +23,15 @@ def surface(x):
     elif x == "Carpet": 
         return 4
 
-def year(x): 
-    x = x[:4]
-    return int(x)
-
-def num_seed(x):
-    if x is None: 
+def seed(x):
+    if pd.isna(x):
         return 0
-    else: 
+    try:
         return int(x)
+    except ValueError:
+        return 0
    
-def num_entry(x): 
+def entry(x): 
     if x == "LL": 
         return 1
     elif x == "Q":
@@ -50,7 +42,7 @@ def num_entry(x):
         return 4
     elif x == "SE":
         return 5
-    elif x == None:
+    elif pd.isna(x):
         return 6
 
 def hand(x):
@@ -62,8 +54,8 @@ def hand(x):
         return 2
 
 def height(x):
-    if x is None: 
-        return int(185)
+    if pd.isna(x):
+        return 185
     else:
         return int(x)
 
@@ -80,19 +72,37 @@ def round(x):
     'RR': 8
 }
     return round_encoding.get(x)
+ 
+def score(x):
+    result = ""
+    reg_sets = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    inside_parentheses = False
+    for i in range(len(x)):
+        if x[i] == "(":
+            inside_parentheses = True
+        elif x[i] == ")":
+            inside_parentheses = False
+        elif not inside_parentheses:
+            result += x[i]
+    result = re.split(r'[-\s]', result)
+    for i in range(len(result)):
+        if result[i] != "RET":
+            reg_sets[i] = result[i]
+        else: 
+            return reg_sets
+    return reg_sets
 
-def already_num(x):
-    return int(x)
     
-def score():
-    pass 
-
 def date_to_unix(x):
-      date = datetime.strptime(x, "%Y%m%d")
+      date = datetime.strptime(str(x), "%Y%m%d")
       return int(date.timestamp())
 
-print(date_to_unix("20250415"))
-
+def rank(x):
+    if pd.isna(x):
+        return -1
+    else: 
+        return int(x)
+    
 players = pd.read_csv("players.csv")
 
 clean_matches = pd.read_csv("clean_matches_5.csv", low_memory=False)
@@ -103,15 +113,40 @@ clean_players = players[
                         ]
 
 
-clean_players.to_csv("clean_players.csv", index=False)
 
+name_id = clean_players[["player_id", "name_first", "name_last"]]
 
-
-cleaned_players = pd.read_csv("clean_players.csv")
-
-
-name_id = cleaned_players[["player_id", "name_first", "name_last"]]
-
-name_id["name_last"] = name_id["name_last"].apply(lambda x: x.split(" ")[-1])
-name_id["name_first"] = name_id["name_first"].apply(lambda x: x.split(" ")[0])
+name_id.loc[:,"name_last"] = name_id["name_last"].apply(lambda x: x.split(" ")[-1])
+name_id.loc[:,"name_first"] = name_id["name_first"].apply(lambda x: x.split(" ")[0])
 name_id.to_csv("name_and_ids.csv", index=False)
+
+clean_matches = clean_matches[["surface", "draw_size", "tourney_date", "match_num", "winner_id", "winner_seed", "winner_entry", "winner_hand", "winner_ht", "winner_age", "loser_id", "loser_seed", "loser_entry", "loser_hand", "loser_ht", "loser_age", "score", "best_of", "round", "minutes", "w_ace", "w_df", "w_svpt", "w_1stIn", "w_1stWon", "w_2ndWon", "w_SvGms", "w_bpSaved", "w_bpFaced", "l_ace", "l_df", "l_svpt", "l_1stIn", "l_1stWon", "l_2ndWon", "l_SvGms", "l_bpSaved", "l_bpFaced", "winner_rank", "winner_rank_points", "loser_rank", "loser_rank_points"]]
+
+clean_matches["surface"] = clean_matches["surface"].apply(surface)
+clean_matches["tourney_date"] = clean_matches["tourney_date"].apply(date_to_unix)
+
+
+clean_matches["winner_seed"] = clean_matches["winner_seed"].apply(seed)
+clean_matches["loser_seed"] = clean_matches["loser_seed"].apply(seed)
+
+clean_matches["winner_entry"] = clean_matches["winner_entry"].apply(entry)
+clean_matches["loser_entry"] = clean_matches["loser_entry"].apply(entry)
+
+clean_matches["winner_hand"] = clean_matches["winner_hand"].apply(hand)
+clean_matches["loser_hand"] = clean_matches["loser_hand"].apply(hand)
+
+clean_matches["winner_ht"] = clean_matches["winner_ht"].apply(height)
+clean_matches["loser_ht"] = clean_matches["loser_ht"].apply(height)
+
+clean_matches["winner_rank"] = clean_matches["winner_rank"].apply(rank)
+clean_matches["loser_rank"] = clean_matches["loser_rank"].apply(rank)
+
+clean_matches["winner_rank_points"] = clean_matches["winner_rank_points"].apply(rank)
+clean_matches["loser_rank_points"] = clean_matches["loser_rank_points"].apply(rank)
+
+clean_matches["round"] = clean_matches["round"].apply(round)
+
+clean_matches["score"] = clean_matches["score"].apply(score)
+
+clean_matches.to_csv("num_matches2.csv", index=False)
+

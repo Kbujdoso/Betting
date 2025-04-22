@@ -11,3 +11,13 @@ def player_finder(x):
             (cleaned_players["name_last"] == playername[1])]
     return int(match.iloc[0]["player_id"])
 
+def id_to_matches(x): 
+    matches = clean_matches[
+        (clean_matches["winner_id"] == x) | 
+        (clean_matches["loser_id"] == x)
+        ]
+    return matches 
+
+def all_id(x): 
+    ids = []
+    ids = cleaned_players["player_id"]

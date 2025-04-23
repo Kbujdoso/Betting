@@ -94,16 +94,26 @@ def score(x):
 
     
 def date_to_unix(x):
-      date = datetime.strptime(str(x), "%Y%m%d")
-      return int(date.timestamp())
+    try: 
+        date = datetime.strptime(str(x), "%Y%m%d")
+        return int(date.timestamp())
+    except ValueError: 
+        return -1
 
 def rank(x):
     if pd.isna(x):
         return -1
     else: 
         return int(x)
-    
-players = pd.read_csv("players.csv")
+def to_number(x):
+    if pd.isna(x):
+        return -1
+    else: 
+        return int(x)
+
+#write a function which handels this
+
+"""players = pd.read_csv("players.csv")
 
 clean_matches = pd.read_csv("clean_matches_5.csv", low_memory=False)
 
@@ -113,14 +123,14 @@ clean_players = players[
                         ]
 
 
-
 name_id = clean_players[["player_id", "name_first", "name_last"]]
 
 name_id.loc[:,"name_last"] = name_id["name_last"].apply(lambda x: x.split(" ")[-1])
 name_id.loc[:,"name_first"] = name_id["name_first"].apply(lambda x: x.split(" ")[0])
 name_id.to_csv("name_and_ids.csv", index=False)
 
-clean_matches = clean_matches[["surface", "draw_size", "tourney_date", "match_num", "winner_id", "winner_seed", "winner_entry", "winner_hand", "winner_ht", "winner_age", "loser_id", "loser_seed", "loser_entry", "loser_hand", "loser_ht", "loser_age", "score", "best_of", "round", "minutes", "w_ace", "w_df", "w_svpt", "w_1stIn", "w_1stWon", "w_2ndWon", "w_SvGms", "w_bpSaved", "w_bpFaced", "l_ace", "l_df", "l_svpt", "l_1stIn", "l_1stWon", "l_2ndWon", "l_SvGms", "l_bpSaved", "l_bpFaced", "winner_rank", "winner_rank_points", "loser_rank", "loser_rank_points"]]
+clean_matches = clean_matches[["surface", "draw_size", "tourney_date", "match_num", "winner_id", "winner_seed", "winner_entry", "winner_hand", "winner_ht", "winner_age", "loser_id", "loser_seed", "loser_entry", "loser_hand", "loser_ht", "loser_age", "score", "best_of", "round", "minutes", "w_ace", "w_df", "w_svpt", "w_1stIn", "w_1stWon", "w_2ndWon", "w_SvGms", "w_bpSaved", "w_bpFaced", "l_ace", "l_df", "l_svpt", "l_1stIn", "l_1stWon", "l_2ndWon", "l_SvGms", "l_bpSaved", "l_bpFaced", "winner_rank", "winner_rank_points", "loser_rank", "loser_rank_points"]]"""
+"""clean_matches = pd.read_csv("num_matches2.csv")
 
 clean_matches["surface"] = clean_matches["surface"].apply(surface)
 clean_matches["tourney_date"] = clean_matches["tourney_date"].apply(date_to_unix)
@@ -147,6 +157,18 @@ clean_matches["loser_rank_points"] = clean_matches["loser_rank_points"].apply(ra
 clean_matches["round"] = clean_matches["round"].apply(round)
 
 clean_matches["score"] = clean_matches["score"].apply(score)
+clean_matches.to_csv("num_matches2.csv", index=False)"""
 
-clean_matches.to_csv("num_matches2.csv", index=False)
+columns = [
+    "surface", "draw_size", "tourney_date", "match_num", "winner_id", "winner_seed",
+    "winner_entry", "winner_hand", "winner_ht", "winner_age", "loser_id", "loser_seed",
+    "loser_entry", "loser_hand", "loser_ht", "loser_age", "best_of", "round",
+    "minutes", "w_ace", "w_df", "w_svpt", "w_1stIn", "w_1stWon", "w_2ndWon", "w_SvGms",
+    "w_bpSaved", "w_bpFaced", "l_ace", "l_df", "l_svpt", "l_1stIn", "l_1stWon", "l_2ndWon",
+    "l_SvGms", "l_bpSaved", "l_bpFaced", "winner_rank", "winner_rank_points", "loser_rank",
+    "loser_rank_points"
+]
 
+data_set = pd.read_csv("num_matches2.csv", low_memory=False)
+data_set[columns] = data_set[columns].applymap(float)
+data_set.to_csv("all_float_matches.csv", index = False)

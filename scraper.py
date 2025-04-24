@@ -22,21 +22,40 @@ def id_to_matches(x):
 ids = cleaned_players["player_id"]
 
 all_matches = []
+def match_searcher(id): 
+    matches = id_to_matches(id)
+    matches = matches.sort_values(by="tourney_date")  # sort matches
+    if len(matches) >= 16:  
+        match_data = matches.iloc[1:16].values.tolist()
+    return match_data
+
+training_data = []
 
 for i in range(len(ids)):
     player_id = int(ids.iloc[i])  #get the actual player_id from the series
 
     matches = id_to_matches(player_id)
     matches = matches.sort_values(by="tourney_date")  # sort matches
-    if len(matches) > 6:  
-        match_data = matches.iloc[1:].values.tolist()
+    """    matches = matches.iloc[0].values.tolist()"""    
+    result = -1
+    if int(matches.iloc[0]["winner_id"]) == player_id:
+        result = 1
+    else:
+        result = 0
+    training_data.append([result, match_searcher(matches.iloc[0]["winner_id"]),match_searcher(matches.iloc[0]["loser_id"])])
+    
+    """if len(matches) >= 16:  
+        match_data = matches.iloc[1:16].values.tolist()
         if int(matches.iloc[0]["winner_id"]) == player_id:
             matches_per_player = [player_id, 1, match_data]
         else:
             matches_per_player = [player_id, 0, match_data]
-        all_matches.append(matches_per_player)
+        all_matches.append(matches_per_player)"""
 
-import csv
+
+
+
+"""import csv
 with open("all_matches.csv", "w", newline="") as f:
     writer = csv.writer(f)
     writer.writerow(["player_id", "label", "matches"])
@@ -46,5 +65,5 @@ with open("all_matches.csv", "w", newline="") as f:
         label = record[1]
         matches = record[2]
         matches_str = json.dumps(matches) 
-        writer.writerow([player_id, label, matches_str])
+        writer.writerow([player_id, label, matches_str])"""
 

@@ -111,7 +111,7 @@ def to_number(x):
     else: 
         return int(x)
 
-#write a function which handels this
+#need a function for main.py which can handle new databases this code was for this database
 
 """players = pd.read_csv("players.csv")
 

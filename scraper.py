@@ -22,12 +22,16 @@ def id_to_matches(x):
 ids = cleaned_players["player_id"]
 
 all_matches = []
-def match_searcher(id): 
+def match_searcher(id,date, match_num): 
     matches = id_to_matches(id)
-    matches = matches.sort_values(by="tourney_date")  # sort matches
-    if len(matches) >= 16:  
-        match_data = matches.iloc[1:16].values.tolist()
-    return match_data
+    matches = matches.sort_values(by=["tourney_date", "match_num"])  # sort matches
+    for i in range(len(matches)):
+        if matches.iloc[i]["tourney_date"] == date and matches.iloc[i]["match_num"] == match_num:
+            x = i
+            break
+    if len(matches) >= x+15:  
+        match_data = matches.iloc[x:x+15].values.tolist()
+        return match_data
 
 training_data = []
 
@@ -35,35 +39,25 @@ for i in range(len(ids)):
     player_id = int(ids.iloc[i])  #get the actual player_id from the series
 
     matches = id_to_matches(player_id)
-    matches = matches.sort_values(by="tourney_date")  # sort matches
-    """    matches = matches.iloc[0].values.tolist()"""    
+    matches = matches.sort_values(by=["tourney_date", "match_num"])  # sort matches
+    date = int(matches.iloc[0]["tourney_date"])  
+    match_num = int(matches.iloc[0]["match_num"])
+
+    
     result = -1
     if int(matches.iloc[0]["winner_id"]) == player_id:
         result = 1
     else:
         result = 0
-    training_data.append([result, match_searcher(matches.iloc[0]["winner_id"]),match_searcher(matches.iloc[0]["loser_id"])])
-    
-    """if len(matches) >= 16:  
-        match_data = matches.iloc[1:16].values.tolist()
-        if int(matches.iloc[0]["winner_id"]) == player_id:
-            matches_per_player = [player_id, 1, match_data]
-        else:
-            matches_per_player = [player_id, 0, match_data]
-        all_matches.append(matches_per_player)"""
+    m1 = match_searcher(matches.iloc[0]["winner_id"],date,match_num)
+    m2 = match_searcher(matches.iloc[0]["loser_id"],date,match_num)
+    if m1 != None and m2 != None:
+        training_data.append([result, match_searcher(matches.iloc[0]["winner_id"],date,match_num),match_searcher(matches.iloc[0]["loser_id"],date, match_num)])
+
+import json
+
+with open("training_data.json", "w", encoding="utf-8") as f:
+    json.dump(training_data, f)
 
 
-
-
-"""import csv
-with open("all_matches.csv", "w", newline="") as f:
-    writer = csv.writer(f)
-    writer.writerow(["player_id", "label", "matches"])
-    
-    for record in all_matches:
-        player_id = record[0]
-        label = record[1]
-        matches = record[2]
-        matches_str = json.dumps(matches) 
-        writer.writerow([player_id, label, matches_str])"""
 

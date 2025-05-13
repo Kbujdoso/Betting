@@ -9,12 +9,12 @@ import pandas as pd
 import tensorflow as tf
 import tf_keras
 import math
+import ast 
+import scraper
 
-# Check the version of TensorFlow Decision Forests
-print("Found TensorFlow Decision Forests v" + tfdf.__version__)
+cleaned_players = pd.read_csv("name_and_ids.csv")
+clean_matches = pd.read_csv("all_float_matches2.csv")
+ids = cleaned_players["player_id"]
 
-
-
-#input pipeline [batch_size, num_features] :: [205.858, 45]
-
+training_data = scraper.data_set(ids)
 

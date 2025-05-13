@@ -8,3 +8,4 @@ database.sqlite
 players.csv
 clean_matches_5.csv
 __pycache__
+training_data_lists.json

@@ -8,3 +8,4 @@ num_matches2.csv filter=lfs diff=lfs merge=lfs -text
 all_float_matches.csv filter=lfs diff=lfs merge=lfs -text
 all_matches.csv filter=lfs diff=lfs merge=lfs -text
 traing_data.json filter=lfs diff=lfs merge=lfs -text
+training_data_lists.json filter=lfs diff=lfs merge=lfs -text

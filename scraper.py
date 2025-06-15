@@ -61,11 +61,10 @@ def data_set(ids):
                 for j in range(len(m2[i])):
                     matches_clean.append(m2[i][j])
                 training_data_lists.append((matches_clean, result))
-
+    return training_data_lists
 
 import json
 def visual_check(x):
-
     with open("visual_test.json", "w", encoding="utf-8") as f:
         json.dump(x, f)
 

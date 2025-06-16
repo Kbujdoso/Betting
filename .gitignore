@@ -9,3 +9,6 @@ players.csv
 clean_matches_5.csv
 __pycache__
 training_data_lists.json
+database.sqlite
+matches.csv
+test_matches.csv
